@@ -2,11 +2,19 @@ import AuthInputField from '@components/form/AuthInputField';
 import Form from '@components/form';
 import colors from '@utils/colors';
 import {FC, useState} from 'react';
-import {Button, SafeAreaView, StyleSheet, View} from 'react-native';
+import {
+  Button,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import * as yup from 'yup';
 import SubmitBtn from '@components/form/SubmitBtn';
 import PasswordVisibilityIcon from '@ui/PasswordVisibilityIcon';
 import AppLink from '@ui/AppLink';
+import CircleUi from '@ui/CircleUi';
 
 const signupSchema = yup.object({
   name: yup
@@ -47,6 +55,35 @@ const SignUp: FC<Props> = props => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <CircleUi position="top-left" size={200} />
+      <CircleUi position="top-right" size={100} />
+      <CircleUi position="bottom-left" size={100} />
+      <CircleUi position="bottom-right" size={200} />
+
+      <View style={{width: '100%', paddingHorizontal: 15, marginBottom: -180}}>
+        <Image
+          style={{
+            width: '55%',
+            height: '40%',
+            marginLeft: 85,
+            marginBottom: -12,
+          }}
+          source={require('../../assets/Main_Logo.png')}
+        />
+        <Text
+          style={{
+            color: colors.SECONDARY,
+            fontSize: 25,
+            fontWeight: 'bold',
+            paddingVertical: 5,
+          }}>
+          Welcome!
+        </Text>
+        <Text style={{color: colors.CONTRAST, fontSize: 16}}>
+          Let's get started by creating your account.
+        </Text>
+      </View>
+
       <Form
         onSubmit={values => {
           console.log(values);
@@ -96,6 +133,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.PRIMARY,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: -90,
   },
   formContainer: {
     width: '100%',
