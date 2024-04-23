@@ -18,6 +18,9 @@ import CircleUi from '@ui/CircleUi';
 import AuthFormContainer from '@components/AuthFormContainer';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthStackParamList} from 'src/@types/navigation';
+import {FormikHelpers} from 'formik';
+import axios from 'axios';
+import client from 'src/api/client';
 
 const signupSchema = yup.object({
   name: yup
@@ -43,6 +46,12 @@ const signupSchema = yup.object({
 
 interface Props {}
 
+interface NewUser {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const initialValues = {
   name: '',
   email: '',
@@ -57,11 +66,25 @@ const SignUp: FC<Props> = props => {
     setSecureEntry(!secureEntry);
   };
 
+  const handleSubmit = async (
+    values: NewUser,
+    actions: FormikHelpers<NewUser>,
+  ) => {
+    try {
+      // we want to send these information to our api
+      const {data} = await client.post('/auth/create', {
+        ...values,
+      });
+
+      console.log(data);
+    } catch (error) {
+      console.log('Sign up error: ', error);
+    }
+  };
+
   return (
     <Form
-      onSubmit={values => {
-        console.log(values);
-      }}
+      onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={signupSchema}>
       <AuthFormContainer
