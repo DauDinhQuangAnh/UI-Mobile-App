@@ -19,7 +19,6 @@ import AuthFormContainer from '@components/AuthFormContainer';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {AuthStackParamList} from 'src/@types/navigation';
 import {FormikHelpers} from 'formik';
-import axios from 'axios';
 import client from 'src/api/client';
 
 const signupSchema = yup.object({
@@ -70,16 +69,18 @@ const SignUp: FC<Props> = props => {
     values: NewUser,
     actions: FormikHelpers<NewUser>,
   ) => {
+    actions.setSubmitting(true);
     try {
       // we want to send these information to our api
       const {data} = await client.post('/auth/create', {
         ...values,
       });
 
-      console.log(data);
+      navigation.navigate('Verification', {userInfo: data.user});
     } catch (error) {
       console.log('Sign up error: ', error);
     }
+    actions.setSubmitting(false);
   };
 
   return (
