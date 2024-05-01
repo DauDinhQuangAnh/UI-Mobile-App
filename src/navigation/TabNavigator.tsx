@@ -6,6 +6,7 @@ import Upload from '@views/Upload';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProfileNavigator from './ProfileNavigator';
+import HomeNavigator from './HomeNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,8 +20,8 @@ const TabNavigator = () => {
         },
       }}>
       <Tab.Screen
-        name="HomeScreen"
-        component={Home}
+        name="HomeNavigtor"
+        component={HomeNavigator}
         options={{
           tabBarIcon: props => {
             return (

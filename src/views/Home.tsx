@@ -3,10 +3,12 @@ import LatestUploads from '@components/LatestUploads';
 import OptionsModal from '@components/OptionsModal';
 import PlaylistForm, {PlaylistInfo} from '@components/PlaylistForm';
 import PlayListModal from '@components/PlaylistModal';
+import RecentlyPlayed from '@components/RecentlyPlayed';
 import RecommendedAudios from '@components/RecommendedAudios';
+import RecommendedPlaylist from '@components/RecommendedPlaylist';
 import colors from '@utils/colors';
 import {FC, useEffect, useState} from 'react';
-import {StyleSheet, Pressable, Text, ScrollView} from 'react-native';
+import {StyleSheet, Pressable, Text, ScrollView, View} from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 import MaterialComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useDispatch} from 'react-redux';
@@ -16,6 +18,10 @@ import {getClient} from 'src/api/client';
 import {useFetchPlaylist} from 'src/hooks/query';
 import useAudioController from 'src/hooks/useAudioController';
 import {upldateNotification} from 'src/store/notification';
+import {
+  updatePlaylistVisbility,
+  updateSelectedListId,
+} from 'src/store/playlistModal';
 
 interface Props {}
 
@@ -62,22 +68,25 @@ const Home: FC<Props> = props => {
 
     try {
       const client = await getClient();
-      const {data} = await client.post('/playlist/create', {
+      await client.post('/playlist/create', {
         resId: selectedAudio?.id,
         title: value.title,
         visibility: value.private ? 'private' : 'public',
       });
-      console.log(data);
+
+      dispatch(
+        upldateNotification({message: 'New lsit added.', type: 'success'}),
+      );
     } catch (error) {
       const errorMessage = catchAsyncError(error);
-      console.log(errorMessage);
+      dispatch(upldateNotification({message: errorMessage, type: 'error'}));
     }
   };
 
   const updatePlaylist = async (item: Playlist) => {
     try {
       const client = await getClient();
-      const {data} = await client.patch('/playlist', {
+      await client.patch('/playlist', {
         id: item.id,
         item: selectedAudio?.id,
         title: item.title,
@@ -91,21 +100,39 @@ const Home: FC<Props> = props => {
       );
     } catch (error) {
       const errorMessage = catchAsyncError(error);
-      console.log(errorMessage);
+      dispatch(upldateNotification({message: errorMessage, type: 'error'}));
     }
+  };
+
+  const handleOnListPress = (playlist: Playlist) => {
+    dispatch(updateSelectedListId(playlist.id));
+    dispatch(updatePlaylistVisbility(true));
   };
 
   return (
     <AppView>
       <ScrollView contentContainerStyle={styles.container}>
-        <LatestUploads
-          onAudioPress={onAudioPress}
-          onAudioLongPress={handleOnLongPress}
-        />
-        <RecommendedAudios
-          onAudioPress={onAudioPress}
-          onAudioLongPress={handleOnLongPress}
-        />
+        <View style={styles.space}>
+          <RecentlyPlayed />
+        </View>
+
+        <View style={styles.space}>
+          <LatestUploads
+            onAudioPress={onAudioPress}
+            onAudioLongPress={handleOnLongPress}
+          />
+        </View>
+        <View style={styles.space}>
+          <RecommendedAudios
+            onAudioPress={onAudioPress}
+            onAudioLongPress={handleOnLongPress}
+          />
+        </View>
+
+        <View style={styles.space}>
+          <RecommendedPlaylist onListPress={handleOnListPress} />
+        </View>
+
         <OptionsModal
           visible={showOptions}
           onRequestClose={() => {
@@ -164,6 +191,9 @@ const Home: FC<Props> = props => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+  },
+  space: {
+    marginBottom: 15,
   },
   optionContainer: {
     flexDirection: 'row',

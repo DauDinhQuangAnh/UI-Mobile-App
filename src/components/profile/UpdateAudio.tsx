@@ -1,27 +1,39 @@
 import AudioForm from '@components/form/AudioForm';
-import colors from '@utils/colors';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {mapRange} from '@utils/math';
 import {FC, useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
+import {useQueryClient} from 'react-query';
 import {useDispatch} from 'react-redux';
+import {ProfileNavigatorStackParamList} from 'src/@types/navigation';
 import catchAsyncError from 'src/api/catchError';
 import {getClient} from 'src/api/client';
 import {upldateNotification} from 'src/store/notification';
 
-interface Props {}
+type Props = NativeStackScreenProps<
+  ProfileNavigatorStackParamList,
+  'UpdateAudio'
+>;
 
-const Upload: FC<Props> = props => {
+const UpdateAudio: FC<Props> = props => {
+  const {audio} = props.route.params;
+
   const [uploadProgress, setUploadProgress] = useState(0);
   const [busy, setBusy] = useState(false);
 
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
-  const handleUpload = async (formData: FormData) => {
+  const dispatch = useDispatch();
+  const {navigate} =
+    useNavigation<NavigationProp<ProfileNavigatorStackParamList>>();
+
+  const handleUpadate = async (formData: FormData) => {
     setBusy(true);
     try {
       const client = await getClient({'Content-Type': 'multipart/form-data;'});
 
-      const {data} = await client.post('/audio/create', formData, {
+      const {data} = await client.patch('/audio/' + audio.id, formData, {
         onUploadProgress(progressEvent) {
           const uploaded = mapRange({
             inputMin: 0,
@@ -39,7 +51,8 @@ const Upload: FC<Props> = props => {
         },
       });
 
-      console.log(data);
+      queryClient.invalidateQueries({queryKey: ['uploads-by-profile']});
+      navigate('Profile');
     } catch (error) {
       const errorMessage = catchAsyncError(error);
       dispatch(upldateNotification({message: errorMessage, type: 'error'}));
@@ -48,46 +61,21 @@ const Upload: FC<Props> = props => {
   };
 
   return (
-    <AudioForm onSubmit={handleUpload} busy={busy} progress={uploadProgress} />
+    <AudioForm
+      initialValues={{
+        title: audio.title,
+        category: audio.category,
+        about: audio.about,
+      }}
+      onSubmit={handleUpadate}
+      busy={busy}
+      progress={uploadProgress}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-  },
-  fileSelctorContainer: {
-    flexDirection: 'row',
-  },
-  formContainer: {
-    marginTop: 20,
-  },
-  input: {
-    borderWidth: 2,
-    borderColor: colors.SECONDARY,
-    borderRadius: 7,
-    padding: 10,
-    fontSize: 18,
-    color: colors.CONTRAST,
-    textAlignVertical: 'top',
-  },
-  category: {
-    padding: 10,
-    color: colors.PRIMARY,
-  },
-  categorySelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  categorySelectorTitle: {
-    color: colors.CONTRAST,
-  },
-  selectedCategory: {
-    color: colors.SECONDARY,
-    marginLeft: 5,
-    fontStyle: 'italic',
-  },
+  container: {},
 });
 
-export default Upload;
+export default UpdateAudio;

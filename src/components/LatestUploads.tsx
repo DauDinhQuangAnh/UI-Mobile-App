@@ -33,6 +33,8 @@ const LatestUploads: FC<Props> = ({onAudioLongPress, onAudioPress}) => {
       </PulseAnimationContainer>
     );
 
+  if (!data?.length) return null;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Latest Uploads</Text>
@@ -55,9 +57,7 @@ const LatestUploads: FC<Props> = ({onAudioLongPress, onAudioPress}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 15,
-  },
+  container: {},
   title: {
     color: colors.CONTRAST,
     fontSize: 20,

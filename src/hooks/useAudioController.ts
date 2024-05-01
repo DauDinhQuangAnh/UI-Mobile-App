@@ -47,10 +47,10 @@ const useAudioController = () => {
     if (!isPalyerReady) {
       // Playing audio for the first time.
       await updateQueue(data);
+      dispatch(updateOnGoingAudio(item));
       const index = data.findIndex(audio => audio.id === item.id);
       await TrackPlayer.skip(index);
       await TrackPlayer.play();
-      dispatch(updateOnGoingAudio(item));
       return dispatch(updateOnGoingList(data));
     }
 
@@ -135,6 +135,7 @@ const useAudioController = () => {
 
       await TrackPlayer.setupPlayer();
       await TrackPlayer.updateOptions({
+        progressUpdateEventInterval: 10,
         android: {
           appKilledPlaybackBehavior:
             AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
