@@ -33,7 +33,7 @@ const updateQueue = async (data: AudioData[]) => {
 };
 
 const useAudioController = () => {
-  const playbackState = usePlaybackState();
+  const { state : playbackState } = usePlaybackState () as { state ?: State };  
   const {onGoingAudio, onGoingList} = useSelector(getPlayerState);
   const dispatch = useDispatch();
 
