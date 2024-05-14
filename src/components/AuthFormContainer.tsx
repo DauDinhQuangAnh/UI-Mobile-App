@@ -38,12 +38,14 @@ const styles = StyleSheet.create({
   },
   heading: {
     color: colors.SECONDARY,
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: 'bold',
     paddingVertical: 5,
+    paddingLeft: 70,
+    paddingTop: -10,
   },
-  subHeading: {color: colors.CONTRAST, fontSize: 16},
-  headerContainer: {width: '100%', marginBottom: 20},
+  subHeading: {color: colors.CONTRAST, fontSize: 16, paddingTop:12},
+  headerContainer: {width: '90%', marginBottom: 20, justifyContent: 'center'},
 });
 
 export default AuthFormContainer;

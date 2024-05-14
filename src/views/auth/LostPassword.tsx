@@ -62,8 +62,8 @@ const LostPassword: FC<Props> = props => {
       initialValues={initialValues}
       validationSchema={lostPasswordSchema}>
       <AuthFormContainer
-        heading="Forget Password!"
-        subHeading="Oops, did you forget your password? Don't worry, we'll help you get back in.">
+        heading="Lost Password?"
+        subHeading="Did you forget your password? Don't worry, we'll help you get back in.">
         <View style={styles.formContainer}>
           <AuthInputField
             name="email"

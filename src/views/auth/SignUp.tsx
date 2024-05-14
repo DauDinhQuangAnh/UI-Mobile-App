@@ -1,7 +1,7 @@
 import AuthInputField from '@components/form/AuthInputField';
 import Form from '@components/form';
 import colors from '@utils/colors';
-import {FC, useState} from 'react';
+import { FC, useState } from 'react';
 import {
   Button,
   Image,
@@ -16,38 +16,24 @@ import PasswordVisibilityIcon from '@ui/PasswordVisibilityIcon';
 import AppLink from '@ui/AppLink';
 import CircleUi from '@ui/CircleUi';
 import AuthFormContainer from '@components/AuthFormContainer';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {AuthStackParamList} from 'src/@types/navigation';
-import {FormikHelpers} from 'formik';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { AuthStackParamList } from 'src/@types/navigation';
+import { FormikHelpers } from 'formik';
 import client from 'src/api/client';
-import {isAxiosError} from 'axios';
-import catchAsyncError from 'src/api/catchError';
-import {useDispatch} from 'react-redux';
-import {upldateNotification} from 'src/store/notification';
+import { useDispatch } from 'react-redux';
+import { updateNotification } from 'src/store/notification';
 
 const signupSchema = yup.object({
-  name: yup
-    .string()
-    .trim('Name is missing!')
-    .min(3, 'Invalid name!')
-    .required('Name is required!'),
-  email: yup
-    .string()
-    .trim('Email is missing!')
-    .email('Invalid email!')
-    .required('Email is required!'),
-  password: yup
-    .string()
-    .trim('Password is missing!')
-    .min(8, 'Password is too short!')
+  name: yup.string().required('Name is required!').min(3, 'Name is too short!'),
+  email: yup.string().required('Email is required!').email('Please enter a valid email address!'),
+  password: yup.string()
+    .required('Password is required!')
+    .min(8, 'Password must be at least 8 characters long!')
     .matches(
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#\$%\^&\*])[a-zA-Z\d!@#\$%\^&\*]+$/,
-      'Password is too simple!',
-    )
-    .required('Password is required!'),
+      'Password must include letters, numbers, and special characters!'
+    ),
 });
-
-interface Props {}
 
 interface NewUser {
   name: string;
@@ -55,13 +41,13 @@ interface NewUser {
   password: string;
 }
 
-const initialValues = {
+const initialValues: NewUser = {
   name: '',
   email: '',
   password: '',
 };
 
-const SignUp: FC<Props> = props => {
+const SignUp: FC = () => {
   const [secureEntry, setSecureEntry] = useState(true);
   const navigation = useNavigation<NavigationProp<AuthStackParamList>>();
   const dispatch = useDispatch();
@@ -70,21 +56,13 @@ const SignUp: FC<Props> = props => {
     setSecureEntry(!secureEntry);
   };
 
-  const handleSubmit = async (
-    values: NewUser,
-    actions: FormikHelpers<NewUser>,
-  ) => {
+  const handleSubmit = async (values: NewUser, actions: FormikHelpers<NewUser>) => {
     actions.setSubmitting(true);
     try {
-      // we want to send these information to our api
-      const {data} = await client.post('/auth/create', {
-        ...values,
-      });
-
-      navigation.navigate('Verification', {userInfo: data.user});
+      const { data } = await client.post('/auth/create', values);
+      navigation.navigate('Verification', { userInfo: data.user });
     } catch (error) {
-      const errorMessage = catchAsyncError(error);
-      dispatch(upldateNotification({message: errorMessage, type: 'error'}));
+      dispatch(updateNotification({ message: 'Failed to sign up, please try again.', type: 'error' }));
     }
     actions.setSubmitting(false);
   };
@@ -94,9 +72,9 @@ const SignUp: FC<Props> = props => {
       onSubmit={handleSubmit}
       initialValues={initialValues}
       validationSchema={signupSchema}>
-      <AuthFormContainer
-        heading="Welcome!"
-        subHeading="Let's get started by creating your account.">
+      <AuthFormContainer 
+        heading="     Welcome!"
+        subHeading="     Let's get started by creating your account.">
         <View style={styles.formContainer}>
           <AuthInputField
             name="name"
@@ -127,15 +105,11 @@ const SignUp: FC<Props> = props => {
           <View style={styles.linkContainer}>
             <AppLink
               title="I Lost My Password"
-              onPress={() => {
-                navigation.navigate('LostPassword');
-              }}
+              onPress={() => navigation.navigate('LostPassword')}
             />
             <AppLink
               title="Sign in"
-              onPress={() => {
-                navigation.navigate('SignIn');
-              }}
+              onPress={() => navigation.navigate('SignIn')}
             />
           </View>
         </View>
@@ -146,7 +120,7 @@ const SignUp: FC<Props> = props => {
 
 const styles = StyleSheet.create({
   formContainer: {
-    width: '100%',
+    width: '90%',
   },
   marginBottom: {
     marginBottom: 20,
